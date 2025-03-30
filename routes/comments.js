@@ -26,7 +26,9 @@ router.post("/:id/comments", async (req, res) => {
 
     const comment = new CommentMp2({
       commentText,
-      author,
+      // author,
+      author: author._id,
+
       lead: req.params.id,
     });
     await comment.save();
