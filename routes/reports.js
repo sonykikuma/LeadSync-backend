@@ -31,4 +31,17 @@ router.get("/pipeline", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// Get Lead Status Distribution
+router.get("/status-distribution", async (req, res) => {
+  try {
+    const leadStatusCounts = await Lead.aggregate([
+      { $group: { _id: "$status", count: { $sum: 1 } } },
+    ]);
+
+    res.json(leadStatusCounts);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
