@@ -9,6 +9,7 @@ const { initializeDatabase } = require("./db");
 app.use(express.json());
 app.use(cors());
 initializeDatabase();
+require("./updateStatus");
 
 // const corsOptions = {
 //   origin: "*",
