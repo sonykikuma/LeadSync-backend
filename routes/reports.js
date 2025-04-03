@@ -7,13 +7,36 @@ router.get("/last-week", async (req, res) => {
   try {
     const lastWeek = new Date();
     lastWeek.setDate(lastWeek.getDate() - 7);
+    lastWeek.setHours(0, 0, 0, 0); // Normalize time
 
-    const closedLeads = await Lead.find({
-      status: "Closed",
-      closedAt: { $gte: lastWeek },
-    }).populate("salesAgent", "name");
+    console.log("Last Week Start Date:", lastWeek);
 
-    res.json(closedLeads);
+    //     const closedLeads = await Lead.find({
+    //       status: "Closed",
+    //  closedAt: { $gte: lastWeek },
+    //     }).populate("salesAgent", "name");
+
+    //     console.log("Closed Leads Found:", closedLeads);
+    //     res.json(closedLeads);
+
+    // Fetch leads where status is "Closed"
+    const closedLeads = await Lead.find({ status: "Closed" }).populate(
+      "salesAgent",
+      "name"
+    );
+
+    console.log("📊 Closed Leads Found in DB:", closedLeads.length);
+
+    // Calculate closedAt dynamically (createdAt + timeToClose days)
+    const filteredLeads = closedLeads.filter((lead) => {
+      const closedAt = new Date(lead.createdAt);
+      closedAt.setDate(closedAt.getDate() + lead.timeToClose);
+      return closedAt >= lastWeek;
+    });
+
+    console.log("Closed Leads Found:", filteredLeads.length);
+
+    res.json(filteredLeads);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
